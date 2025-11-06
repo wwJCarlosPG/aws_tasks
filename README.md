@@ -141,6 +141,12 @@ curl -X PUT \
     }
   ```
 
+## Aditional Info:
+Simple tests were implemented in ```aws_tasks/local_tests``` with a local dynamodb to ensure the correctness of the functions before deployment.
+
+
+**Author**: Jan Carlos Pérez González
+
 
 
 
