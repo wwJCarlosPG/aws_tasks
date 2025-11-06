@@ -21,13 +21,14 @@ def lambda_handler(event, context):
     }
 
     try:
+        # Validate the task data
         validated_task = Task(**task_item)
     except ValidationError as e:
         return{
             "statusCode": 400,
             "body": e.json()
         }
-    print(task_id)
+
     try:
         response = table.update_item(
             Key={"task_id": task_id},

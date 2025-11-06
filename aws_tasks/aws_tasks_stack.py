@@ -14,6 +14,7 @@ class AwsTasksStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        # table definition
         table = dynamodb.Table(
             self, 'Tasks_Table',
             table_name= os.environ.get('TABLE_NAME', 'TasksTable'),
@@ -21,6 +22,7 @@ class AwsTasksStack(Stack):
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST
         )
 
+        # layer definition
         layer = lambda_.LayerVersion(
             self, 'TasksLayer',
             code=lambda_.Code.from_asset('layer'),
@@ -28,6 +30,7 @@ class AwsTasksStack(Stack):
             description='A layer to share code between Lambda functions'
         )
 
+        # create_task lambda function
         create_task = lambda_.Function(
             self, 'CreateTask',
             runtime = lambda_.Runtime.PYTHON_3_13,
@@ -38,6 +41,7 @@ class AwsTasksStack(Stack):
         )
         table.grant_full_access(create_task)
 
+        # get_task lambda function
         get_task = lambda_.Function(
             self, 'GetTask',
             runtime = lambda_.Runtime.PYTHON_3_13,
@@ -48,6 +52,7 @@ class AwsTasksStack(Stack):
         )
         table.grant_read_data(get_task)
 
+        # update_task lambda function
         update_task = lambda_.Function(
             self, 'UpdateTask',
             runtime = lambda_.Runtime.PYTHON_3_13,
@@ -58,6 +63,7 @@ class AwsTasksStack(Stack):
         )
         table.grant_read_write_data(update_task)
 
+        # delete_task lambda function
         delete_task = lambda_.Function(
             self, 'DeleteTask',
             runtime = lambda_.Runtime.PYTHON_3_13,
@@ -68,11 +74,13 @@ class AwsTasksStack(Stack):
         )
         table.grant_read_write_data(delete_task)
 
+        # API Gateway definition
         api = apigateway.RestApi(
             self, 'TasksApi',
             rest_api_name = "Tasks Service"
         )
 
+        # API Gateway resources and methods
         tasks = api.root.add_resource("tasks")
         task = tasks.add_resource("{task_id}")
         tasks.add_method("POST", apigateway.LambdaIntegration(create_task))

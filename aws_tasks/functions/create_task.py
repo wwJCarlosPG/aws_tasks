@@ -24,6 +24,7 @@ def lambda_handler(event, context):
         'status': body['status']
     }
     try:
+        # Validate the task data
         validated_task = Task(**task_item)
     except ValidationError as e:
         return {

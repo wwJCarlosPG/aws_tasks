@@ -22,6 +22,7 @@ def lambda_handler(event, context):
     response = table.get_item(Key={'task_id': task_id})
     
     if "Item" in response:
+        # Validate and serialize the task data
         validated_task = Task(**response["Item"])
         return {
             "statusCode": 200,
